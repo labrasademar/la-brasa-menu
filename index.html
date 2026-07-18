@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#11100e">
+    <meta name="description" content="La Brasa - Carte du restaurant">
+    <title>La Brasa</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rye&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Choix de la langue -->
+    <main id="language-screen" class="language-screen">
+        <div class="decorative-border">
+            <section class="welcome">
+                <p class="bar-label">BAR</p>
+                <h1 class="logo-title">LA BRASA</h1>
+                <p class="tagline">PINXOS · TAPAS · BRASA</p>
+
+                <div class="fire-symbol" aria-hidden="true">◆</div>
+
+                <h2>Benvinguts · Bienvenidos<br>Bienvenue · Welcome</h2>
+                <p class="language-subtitle">Selecciona el teu idioma</p>
+
+                <div class="language-buttons">
+                    <button class="language-button" data-language="ca">CATALÀ</button>
+                    <button class="language-button" data-language="es">ESPAÑOL</button>
+                    <button class="language-button" data-language="fr">FRANÇAIS</button>
+                    <button class="language-button" data-language="en">ENGLISH</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Carte -->
+    <main id="menu-screen" class="menu-screen hidden">
+        <header class="menu-header">
+            <div class="header-inner">
+                <p class="bar-label">BAR</p>
+                <h1 class="menu-logo">LA BRASA</h1>
+                <p class="tagline">PINXOS · TAPAS · BRASA</p>
+                <div class="menu-banner">
+                    <span id="menu-title">LA CARTE</span>
+                </div>
+            </div>
+        </header>
+
+        <nav class="language-nav" aria-label="Choisir la langue">
+            <button data-language="ca">CA</button>
+            <button data-language="es">ES</button>
+            <button data-language="fr">FR</button>
+            <button data-language="en">EN</button>
+        </nav>
+
+        <section id="loading" class="status-message">
+            <div class="loader"></div>
+        </section>
+
+        <section id="error" class="status-message hidden">
+            <p id="error-message">Impossible de charger la carte.</p>
+            <button id="retry-button" class="retry-button">Réessayer</button>
+        </section>
+
+        <div id="menu-content" class="menu-content"></div>
+
+        <footer class="footer">
+            <div class="footer-fire">◆</div>
+            <p class="footer-logo">LA BRASA</p>
+            <p id="footer-message">BON APPÉTIT</p>
+        </footer>
+    </main>
+
+    <script src="js/sheets.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
