@@ -14,14 +14,12 @@
 </head>
 
 <body>
-    <!-- Choix de la langue -->
     <main id="language-screen" class="language-screen">
         <div class="decorative-border">
             <section class="welcome">
                 <p class="bar-label">BAR</p>
                 <h1 class="logo-title">LA BRASA</h1>
                 <p class="tagline">PINXOS · TAPAS · BRASA</p>
-
                 <div class="fire-symbol" aria-hidden="true">◆</div>
 
                 <h2>Benvinguts · Bienvenidos<br>Bienvenue · Welcome</h2>
@@ -37,25 +35,29 @@
         </div>
     </main>
 
-    <!-- Carte -->
     <main id="menu-screen" class="menu-screen hidden">
         <header class="menu-header">
             <div class="header-inner">
                 <p class="bar-label">BAR</p>
                 <h1 class="menu-logo">LA BRASA</h1>
                 <p class="tagline">PINXOS · TAPAS · BRASA</p>
+
                 <div class="menu-banner">
                     <span id="menu-title">LA CARTE</span>
                 </div>
             </div>
         </header>
 
-        <nav class="language-nav" aria-label="Choisir la langue">
-            <button data-language="ca">CA</button>
-            <button data-language="es">ES</button>
-            <button data-language="fr">FR</button>
-            <button data-language="en">EN</button>
-        </nav>
+        <div class="sticky-navigation">
+            <nav class="language-nav" aria-label="Choisir la langue">
+                <button data-language="ca">CA</button>
+                <button data-language="es">ES</button>
+                <button data-language="fr">FR</button>
+                <button data-language="en">EN</button>
+            </nav>
+
+            <nav id="category-nav" class="category-nav hidden" aria-label="Catégories"></nav>
+        </div>
 
         <section id="loading" class="status-message">
             <div class="loader"></div>
@@ -67,6 +69,11 @@
         </section>
 
         <div id="menu-content" class="menu-content"></div>
+
+        <section id="allergen-legend" class="allergen-legend hidden">
+            <h2 id="allergen-legend-title">ALLERGÈNES</h2>
+            <div id="allergen-legend-content" class="allergen-legend-content"></div>
+        </section>
 
         <footer class="footer">
             <div class="footer-fire">◆</div>
