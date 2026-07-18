@@ -4,6 +4,7 @@ const LANGUAGES = {
         name: "Nom CA",
         description: "Descripció CA",
         menuTitle: "LA CARTA",
+        allergenTitle: "AL·LÈRGENS",
         footer: "BONA GENT · BON MENJAR · SALUT",
         error: "No s'ha pogut carregar la carta.",
         retry: "Tornar-ho a provar"
@@ -13,6 +14,7 @@ const LANGUAGES = {
         name: "Nombre ES",
         description: "Descripción ES",
         menuTitle: "LA CARTA",
+        allergenTitle: "ALÉRGENOS",
         footer: "BUENA GENTE · BUENA COMIDA · ¡SALUD!",
         error: "No se ha podido cargar la carta.",
         retry: "Reintentar"
@@ -22,6 +24,7 @@ const LANGUAGES = {
         name: "Nom FR",
         description: "Description FR",
         menuTitle: "LA CARTE",
+        allergenTitle: "ALLERGÈNES",
         footer: "BONNE COMPAGNIE · BONNE CUISINE · SANTÉ !",
         error: "Impossible de charger la carte.",
         retry: "Réessayer"
@@ -31,13 +34,88 @@ const LANGUAGES = {
         name: "Name EN",
         description: "Description EN",
         menuTitle: "MENU",
+        allergenTitle: "ALLERGENS",
         footer: "GOOD PEOPLE · GOOD FOOD · CHEERS!",
         error: "Unable to load the menu.",
         retry: "Try again"
     }
 };
 
+const ALLERGENS = {
+    gluten: {
+        file: "gluten.png",
+        aliases: ["gluten"],
+        ca: "Gluten", es: "Gluten", fr: "Gluten", en: "Gluten"
+    },
+    crustaces: {
+        file: "crustaces.png",
+        aliases: ["crustaces", "crustacés", "crustace", "crustacés"],
+        ca: "Crustacis", es: "Crustáceos", fr: "Crustacés", en: "Crustaceans"
+    },
+    oeufs: {
+        file: "oeufs.png",
+        aliases: ["oeufs", "œufs", "oeuf", "œuf", "huevos", "ous", "eggs"],
+        ca: "Ous", es: "Huevos", fr: "Œufs", en: "Eggs"
+    },
+    poissons: {
+        file: "poissons.png",
+        aliases: ["poisson", "poissons", "pescado", "peix", "fish"],
+        ca: "Peix", es: "Pescado", fr: "Poissons", en: "Fish"
+    },
+    arachides: {
+        file: "arachides.png",
+        aliases: ["arachide", "arachides", "cacahuete", "cacahuetes", "cacauet", "cacauets", "peanut", "peanuts"],
+        ca: "Cacauets", es: "Cacahuetes", fr: "Arachides", en: "Peanuts"
+    },
+    soja: {
+        file: "soja.png",
+        aliases: ["soja", "soy"],
+        ca: "Soja", es: "Soja", fr: "Soja", en: "Soy"
+    },
+    lait: {
+        file: "lait.png",
+        aliases: ["lait", "leche", "llet", "milk"],
+        ca: "Llet", es: "Leche", fr: "Lait", en: "Milk"
+    },
+    fruitsacoque: {
+        file: "fruits-a-coque.png",
+        aliases: ["fruits a coque", "fruits à coque", "frutos secos", "fruits secs", "nuts"],
+        ca: "Fruits secs", es: "Frutos de cáscara", fr: "Fruits à coque", en: "Nuts"
+    },
+    celeri: {
+        file: "celeri.png",
+        aliases: ["celeri", "céleri", "apio", "api", "celery"],
+        ca: "Api", es: "Apio", fr: "Céleri", en: "Celery"
+    },
+    moutarde: {
+        file: "moutarde.png",
+        aliases: ["moutarde", "mostaza", "mostassa", "mustard"],
+        ca: "Mostassa", es: "Mostaza", fr: "Moutarde", en: "Mustard"
+    },
+    sesame: {
+        file: "sesame.png",
+        aliases: ["sesame", "sésame", "sesamo", "sésamo"],
+        ca: "Sèsam", es: "Sésamo", fr: "Sésame", en: "Sesame"
+    },
+    sulfites: {
+        file: "sulfites.png",
+        aliases: ["sulfites", "sulfitos", "sulphites"],
+        ca: "Sulfits", es: "Sulfitos", fr: "Sulfites", en: "Sulphites"
+    },
+    lupin: {
+        file: "lupin.png",
+        aliases: ["lupin", "altramuz", "tramussos"],
+        ca: "Tramussos", es: "Altramuces", fr: "Lupin", en: "Lupin"
+    },
+    mollusques: {
+        file: "mollusques.png",
+        aliases: ["mollusque", "mollusques", "moluscos", "mol·luscs", "moluscs", "molluscs"],
+        ca: "Mol·luscs", es: "Moluscos", fr: "Mollusques", en: "Molluscs"
+    }
+};
+
 const PRICE_COLUMN = "Prix";
+const ALLERGEN_COLUMN = "Allergènes";
 
 let menuData = [];
 let currentLanguage = null;
@@ -51,8 +129,10 @@ const errorMessage = document.getElementById("error-message");
 const retryButton = document.getElementById("retry-button");
 const menuTitle = document.getElementById("menu-title");
 const footerMessage = document.getElementById("footer-message");
-
-/* Sélection de la langue */
+const categoryNav = document.getElementById("category-nav");
+const allergenLegend = document.getElementById("allergen-legend");
+const allergenLegendTitle = document.getElementById("allergen-legend-title");
+const allergenLegendContent = document.getElementById("allergen-legend-content");
 
 document.querySelectorAll("[data-language]").forEach(button => {
     button.addEventListener("click", () => selectLanguage(button.dataset.language));
@@ -62,12 +142,6 @@ async function selectLanguage(language) {
     if (!LANGUAGES[language]) return;
 
     currentLanguage = language;
-
-    try {
-        localStorage.setItem("la-brasa-language", language);
-    } catch (error) {
-        // Le stockage local n'est pas indispensable au fonctionnement.
-    }
 
     const url = new URL(window.location.href);
     url.searchParams.set("lang", language);
@@ -83,8 +157,6 @@ function showMenuScreen() {
     menuScreen.classList.remove("hidden");
 }
 
-/* Chargement du Google Sheet */
-
 async function loadMenu() {
     showLoading();
 
@@ -97,33 +169,34 @@ async function loadMenu() {
     }
 }
 
-/* Génération de la carte */
-
 function renderMenu() {
     const language = LANGUAGES[currentLanguage];
     const categories = new Map();
+    const usedAllergens = new Set();
 
     menuData.forEach(item => {
         const category = cleanText(item[language.category]);
         const name = cleanText(item[language.name]);
         const description = cleanText(item[language.description]);
         const price = cleanText(item[PRICE_COLUMN]);
+        const allergens = parseAllergens(item[ALLERGEN_COLUMN]);
 
         if (!name || !category) return;
         if (!categories.has(category)) categories.set(category, []);
 
-        categories.get(category).push({
-            name,
-            description,
-            price
-        });
+        allergens.forEach(allergen => usedAllergens.add(allergen));
+        categories.get(category).push({ name, description, price, allergens });
     });
 
     menuContent.innerHTML = "";
+    categoryNav.innerHTML = "";
 
     categories.forEach((items, categoryName) => {
+        const categoryId = createSlug(categoryName);
+
         const section = document.createElement("section");
         section.className = "menu-category";
+        section.id = categoryId;
 
         const title = document.createElement("h2");
         title.className = "category-title";
@@ -132,8 +205,16 @@ function renderMenu() {
 
         items.forEach(item => section.appendChild(createMenuItem(item)));
         menuContent.appendChild(section);
+
+        const navButton = document.createElement("button");
+        navButton.className = "category-button";
+        navButton.textContent = categoryName;
+        navButton.addEventListener("click", () => scrollToCategory(categoryId));
+        categoryNav.appendChild(navButton);
     });
 
+    categoryNav.classList.toggle("hidden", categories.size === 0);
+    renderAllergenLegend(usedAllergens);
     hideLoading();
 }
 
@@ -164,10 +245,6 @@ function createMenuItem(item) {
 
     article.appendChild(main);
 
-    /*
-     * Si la description est vide, aucun élément HTML n'est créé.
-     * Il n'y aura donc ni message ni espace réservé.
-     */
     if (item.description) {
         const description = document.createElement("p");
         description.className = "item-description";
@@ -175,10 +252,83 @@ function createMenuItem(item) {
         article.appendChild(description);
     }
 
+    if (item.allergens.length > 0) {
+        const allergens = document.createElement("div");
+        allergens.className = "item-allergens";
+
+        item.allergens.forEach(key => {
+            const allergen = ALLERGENS[key];
+            const image = document.createElement("img");
+
+            image.src = `assets/allergens/${allergen.file}`;
+            image.alt = allergen[currentLanguage];
+            image.title = allergen[currentLanguage];
+            image.loading = "lazy";
+
+            allergens.appendChild(image);
+        });
+
+        article.appendChild(allergens);
+    }
+
     return article;
 }
 
-/* Mise à jour des textes selon la langue */
+function parseAllergens(value) {
+    const text = cleanText(value);
+    if (!text) return [];
+
+    const entries = text.split(/[,;]+/).map(entry => normalizeText(entry)).filter(Boolean);
+    const matches = [];
+
+    entries.forEach(entry => {
+        Object.entries(ALLERGENS).forEach(([key, allergen]) => {
+            const aliases = allergen.aliases.map(alias => normalizeText(alias));
+            if (aliases.includes(entry) && !matches.includes(key)) matches.push(key);
+        });
+    });
+
+    return matches;
+}
+
+function renderAllergenLegend(usedAllergens) {
+    allergenLegendContent.innerHTML = "";
+
+    if (usedAllergens.size === 0) {
+        allergenLegend.classList.add("hidden");
+        return;
+    }
+
+    usedAllergens.forEach(key => {
+        const allergen = ALLERGENS[key];
+
+        const item = document.createElement("div");
+        item.className = "legend-item";
+
+        const image = document.createElement("img");
+        image.src = `assets/allergens/${allergen.file}`;
+        image.alt = "";
+
+        const label = document.createElement("span");
+        label.textContent = allergen[currentLanguage];
+
+        item.appendChild(image);
+        item.appendChild(label);
+        allergenLegendContent.appendChild(item);
+    });
+
+    allergenLegend.classList.remove("hidden");
+}
+
+function scrollToCategory(categoryId) {
+    const section = document.getElementById(categoryId);
+    if (!section) return;
+
+    const navigationHeight = document.querySelector(".sticky-navigation").offsetHeight;
+    const top = section.getBoundingClientRect().top + window.scrollY - navigationHeight - 18;
+
+    window.scrollTo({ top, behavior: "smooth" });
+}
 
 function updateLanguageInterface() {
     const language = LANGUAGES[currentLanguage];
@@ -188,18 +338,18 @@ function updateLanguageInterface() {
     footerMessage.textContent = language.footer;
     errorMessage.textContent = language.error;
     retryButton.textContent = language.retry;
+    allergenLegendTitle.textContent = language.allergenTitle;
 
     document.querySelectorAll(".language-nav button").forEach(button => {
         button.classList.toggle("active", button.dataset.language === currentLanguage);
     });
 }
 
-/* États de l'interface */
-
 function showLoading() {
     loadingElement.classList.remove("hidden");
     errorElement.classList.add("hidden");
     menuContent.classList.add("hidden");
+    categoryNav.classList.add("hidden");
 }
 
 function hideLoading() {
@@ -211,6 +361,7 @@ function hideLoading() {
 function showError() {
     loadingElement.classList.add("hidden");
     menuContent.classList.add("hidden");
+    categoryNav.classList.add("hidden");
     errorElement.classList.remove("hidden");
 }
 
@@ -224,18 +375,24 @@ function cleanText(value) {
     return String(value).trim();
 }
 
-/* Une URL comme ?lang=fr permet d'ouvrir directement la carte française. */
+function normalizeText(value) {
+    return cleanText(value)
+        .toLowerCase()
+        .replace(/œ/g, "oe")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+}
+
+function createSlug(value) {
+    return `category-${normalizeText(value).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+}
 
 function init() {
     const params = new URLSearchParams(window.location.search);
     const urlLanguage = params.get("lang");
 
-    if (urlLanguage && LANGUAGES[urlLanguage]) {
-        selectLanguage(urlLanguage);
-        return;
-    }
-
-    // Sans paramètre ?lang=, on affiche toujours l'écran d'accueil.
+    if (urlLanguage && LANGUAGES[urlLanguage]) selectLanguage(urlLanguage);
 }
 
 init();
