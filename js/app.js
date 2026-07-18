@@ -272,7 +272,7 @@ function createMenuItem(item) {
             const allergen = ALLERGENS[key];
             const image = document.createElement("img");
 
-            image.src = `assets/allergens/${allergen.file}`;
+            image.src = `assets/${allergen.file}`;
             image.alt = allergen[currentLanguage];
             image.title = allergen[currentLanguage];
             image.loading = "lazy";
@@ -311,7 +311,7 @@ function renderAllergenLegend() {
         item.className = "legend-item";
 
         const image = document.createElement("img");
-        image.src = `assets/allergens/${allergen.file}`;
+        image.src = `assets/${allergen.file}`;
         image.alt = allergen.sheetName;
 
         const label = document.createElement("span");
