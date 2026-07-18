@@ -130,6 +130,7 @@ const ALLERGENS = {
 
 const PRICE_COLUMN = "Prix";
 const ALLERGEN_COLUMN = "Allergènes";
+const ACTIVE_COLUMN = "Actif";
 
 let menuData = [];
 let currentLanguage = null;
@@ -188,17 +189,19 @@ function renderMenu() {
     const categories = new Map();
     
     menuData.forEach(item => {
-        const category = cleanText(item[language.category]);
-        const name = cleanText(item[language.name]);
-        const description = cleanText(item[language.description]);
-        const price = cleanText(item[PRICE_COLUMN]);
-        const allergens = parseAllergens(item[ALLERGEN_COLUMN]);
+    const isActive = cleanText(item[ACTIVE_COLUMN]).toLowerCase();
+    if (isActive !== "true") return;
 
-        if (!name || !category) return;
-        if (!categories.has(category)) categories.set(category, []);
+    const category = cleanText(item[language.category]);
+    const name = cleanText(item[language.name]);
+    const description = cleanText(item[language.description]);
+    const price = cleanText(item[PRICE_COLUMN]);
+    const allergens = parseAllergens(item[ALLERGEN_COLUMN]);
 
-        categories.get(category).push({ name, description, price, allergens });
-    });
+    if (!name || !category) return;
+    if (!categories.has(category)) categories.set(category, []);
+    categories.get(category).push({ name, description, price, allergens });
+});
 
     menuContent.innerHTML = "";
     categoryNav.innerHTML = "";
