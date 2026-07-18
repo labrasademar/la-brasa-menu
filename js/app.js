@@ -44,71 +44,85 @@ const LANGUAGES = {
 const ALLERGENS = {
     gluten: {
         file: "gluten.png",
+        sheetName: "Gluten",
         aliases: ["gluten"],
         ca: "Gluten", es: "Gluten", fr: "Gluten", en: "Gluten"
     },
     crustaces: {
         file: "crustaces.png",
-        aliases: ["crustaces", "crustacés", "crustace", "crustacés"],
+        sheetName: "Crustacés",
+        aliases: ["crustaces", "crustacés", "crustace", "crustacé"],
         ca: "Crustacis", es: "Crustáceos", fr: "Crustacés", en: "Crustaceans"
     },
     oeufs: {
         file: "oeufs.png",
+        sheetName: "Oeufs",
         aliases: ["oeufs", "œufs", "oeuf", "œuf", "huevos", "ous", "eggs"],
         ca: "Ous", es: "Huevos", fr: "Œufs", en: "Eggs"
     },
     poissons: {
         file: "poissons.png",
+        sheetName: "Poissons",
         aliases: ["poisson", "poissons", "pescado", "peix", "fish"],
         ca: "Peix", es: "Pescado", fr: "Poissons", en: "Fish"
     },
     arachides: {
         file: "arachides.png",
+        sheetName: "Arachides",
         aliases: ["arachide", "arachides", "cacahuete", "cacahuetes", "cacauet", "cacauets", "peanut", "peanuts"],
         ca: "Cacauets", es: "Cacahuetes", fr: "Arachides", en: "Peanuts"
     },
     soja: {
         file: "soja.png",
+        sheetName: "Soja",
         aliases: ["soja", "soy"],
         ca: "Soja", es: "Soja", fr: "Soja", en: "Soy"
     },
     lait: {
         file: "lait.png",
+        sheetName: "Lait",
         aliases: ["lait", "leche", "llet", "milk"],
         ca: "Llet", es: "Leche", fr: "Lait", en: "Milk"
     },
     fruitsacoque: {
         file: "fruits-a-coque.png",
+        sheetName: "Fruits à coque",
         aliases: ["fruits a coque", "fruits à coque", "frutos secos", "fruits secs", "nuts"],
         ca: "Fruits secs", es: "Frutos de cáscara", fr: "Fruits à coque", en: "Nuts"
     },
     celeri: {
         file: "celeri.png",
+        sheetName: "Céleri",
         aliases: ["celeri", "céleri", "apio", "api", "celery"],
         ca: "Api", es: "Apio", fr: "Céleri", en: "Celery"
     },
     moutarde: {
         file: "moutarde.png",
+        sheetName: "Moutarde",
         aliases: ["moutarde", "mostaza", "mostassa", "mustard"],
         ca: "Mostassa", es: "Mostaza", fr: "Moutarde", en: "Mustard"
     },
     sesame: {
         file: "sesame.png",
+        sheetName: "Sésame",
         aliases: ["sesame", "sésame", "sesamo", "sésamo"],
         ca: "Sèsam", es: "Sésamo", fr: "Sésame", en: "Sesame"
     },
     sulfites: {
         file: "sulfites.png",
+        sheetName: "Sulfites",
         aliases: ["sulfites", "sulfitos", "sulphites"],
         ca: "Sulfits", es: "Sulfitos", fr: "Sulfites", en: "Sulphites"
     },
     lupin: {
         file: "lupin.png",
-        aliases: ["lupin", "altramuz", "tramussos"],
+        sheetName: "Lupin",
+        aliases: ["lupin", "altramuz", "altramuces", "tramussos"],
         ca: "Tramussos", es: "Altramuces", fr: "Lupin", en: "Lupin"
     },
     mollusques: {
         file: "mollusques.png",
+        sheetName: "Mollusques",
         aliases: ["mollusque", "mollusques", "moluscos", "mol·luscs", "moluscs", "molluscs"],
         ca: "Mol·luscs", es: "Moluscos", fr: "Mollusques", en: "Molluscs"
     }
@@ -172,8 +186,7 @@ async function loadMenu() {
 function renderMenu() {
     const language = LANGUAGES[currentLanguage];
     const categories = new Map();
-    const usedAllergens = new Set();
-
+    
     menuData.forEach(item => {
         const category = cleanText(item[language.category]);
         const name = cleanText(item[language.name]);
@@ -184,7 +197,6 @@ function renderMenu() {
         if (!name || !category) return;
         if (!categories.has(category)) categories.set(category, []);
 
-        allergens.forEach(allergen => usedAllergens.add(allergen));
         categories.get(category).push({ name, description, price, allergens });
     });
 
@@ -214,7 +226,7 @@ function renderMenu() {
     });
 
     categoryNav.classList.toggle("hidden", categories.size === 0);
-    renderAllergenLegend(usedAllergens);
+    renderAllergenLegend();
     hideLoading();
 }
 
@@ -291,26 +303,19 @@ function parseAllergens(value) {
     return matches;
 }
 
-function renderAllergenLegend(usedAllergens) {
+function renderAllergenLegend() {
     allergenLegendContent.innerHTML = "";
 
-    if (usedAllergens.size === 0) {
-        allergenLegend.classList.add("hidden");
-        return;
-    }
-
-    usedAllergens.forEach(key => {
-        const allergen = ALLERGENS[key];
-
+    Object.values(ALLERGENS).forEach(allergen => {
         const item = document.createElement("div");
         item.className = "legend-item";
 
         const image = document.createElement("img");
         image.src = `assets/allergens/${allergen.file}`;
-        image.alt = "";
+        image.alt = allergen.sheetName;
 
         const label = document.createElement("span");
-        label.textContent = allergen[currentLanguage];
+        label.textContent = allergen.sheetName;
 
         item.appendChild(image);
         item.appendChild(label);
